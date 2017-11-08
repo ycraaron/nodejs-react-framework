@@ -1,5 +1,4 @@
 let mongoose = require('mongoose');
-mongoose.set('debug', true);
 
 //keep schema as clean as possible
 let ZoneSchema = new mongoose.Schema({

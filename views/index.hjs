@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+
+  </head>
+  <body>
+    
+    <div id = "root"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDUZSga6WOvgCHfkHUUgTnF--nqS8ykDnQ"></script>    
+    <script type="text/javascript" src="/build/bundle.js"></script>
+  </body>
+</html>
