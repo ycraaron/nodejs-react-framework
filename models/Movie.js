@@ -6,7 +6,7 @@ let MovieSchema = new mongoose.Schema({
     actor_2: {type:String, default:''},
     actor_3: {type:String, default:''},  
     director: {type:String, default:''},
-    locations: {type:String, default:''},
+    locations: {type:Array, default:[]},
     production_company:{type:String, default:''}, 
     release_year:{type:String, default:''}, 
     title: {type:String, default:''},

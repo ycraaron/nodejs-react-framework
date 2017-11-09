@@ -16,9 +16,12 @@
     "morgan": "~1.9.0",
     "react": "^16.0.0",
     "react-dom": "^16.0.0",
+    "react-google-autocomplete": "^1.0.15",
     "react-google-maps": "^9.2.2",
+    "react-google-places": "^2.0.3",
     "rimraf": "^2.6.2",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "superagent": "^3.8.1"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",

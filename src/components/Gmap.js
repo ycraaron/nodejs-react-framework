@@ -24,9 +24,23 @@ class Map extends Component {
   }
 
   render() {
-    const markers = this.props.markers || [];
+    // const markers = this.props.markers.map((venue, i )=>{
+    //     const marker = {
+    //         position:{
+    //             lat: venue.location.lat,
+    //             lng: venue.location.lng
+    //         }
+    //     }
+    //     return <Marker key={i} position = {marker.position} />
+    // })
+    const markers = this.props.markers || []
+    console.log(markers);
     let center = this.props.center;
     let zoom = this.props.zoom;
+
+    // markers.map((marker, index) =>(
+    //     console.log(marker.location.lat)
+    // ))
 
     return (
         <GoogleMap
@@ -34,7 +48,12 @@ class Map extends Component {
           onDragEnd={this.mapMoved.bind(this)}
           defaultZoom={ zoom }
           defaultCenter={ center }>
-         {this.props.isMarkerShown && <Marker position={center} />}
+          {markers.map((marker, index) => (
+            <Marker
+                key = {index} 
+                position={{ lat: marker.location.lat, lng: marker.location.lng }}
+            />
+            ))}
         </GoogleMap>
     );
   }

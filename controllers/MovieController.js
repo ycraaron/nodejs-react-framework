@@ -3,11 +3,25 @@
 let Movie = require('../models/Movie')
 
 module.exports = {
-
+    
     // name find not working
     // conflict to system reserved keyword?
-    finding : function(params, callback){
-        Movie.find(params, function(err, zones){
+    findByName : function(name, callback){
+        console.log('calling aarontest')
+        Movie.find({title:name}, function(err, movies){
+            // error always first
+            // payload second
+            if (err){
+                callback(err, null)
+                return
+            }
+            callback(null, movies)
+        })
+    },
+
+    findAll : function(params, callback){
+        console.log(params)
+        Movie.findOne(params, function(err, movies){
             // error always first
             // payload second
             if (err){
@@ -15,17 +29,31 @@ module.exports = {
                 return
             }
             
-            callback(null, zones)
+            callback(null, movies)
         })
     },
 
-    findById : function(name, callback){
-        Movie.find({"title": name}, function(err,zone){
+    saveMovieToMongo : function(movie, callback){
+        
+        let zips = params['zipCodes']
+        let zip = zips.split(',')
+        let newZips = []
+        
+        zip.forEach(function(zipCode){
+            newZips.push(zipCode.trim())
+        })
+
+        params['zipCodes'] = newZips
+
+        console.log('creating movie')
+        Movie.create(doc, function(err, result){
             if (err){
                 callback(err, null)
                 return
             }
-            callback(null, zone)
+            else
+                callback(null, result)
         })
     }
+
 }
