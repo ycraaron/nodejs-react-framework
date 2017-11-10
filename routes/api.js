@@ -3,6 +3,7 @@ let express = require('express');
 let router = express.Router();
 let ZoneController = require('../controllers/ZoneController');
 let MovieController = require('../controllers/MovieController')
+const fs = require('fs');
 
 router.get('/', function(req, res, next){
     
@@ -17,19 +18,52 @@ router.get('/', function(req, res, next){
 
 router.get('/:resource', function(req, res, next){
     let resource = req.params.resource
-    if (resource == 'movie'){
-        MovieController.aarontest(req.query, function(err, results){
-            if (err){
+    if (resource == 'save-movie-to-mongo'){
+        let rawData = fs.readFileSync('./src/data/movie-part1.json')
+        let movies = JSON.parse(rawData)
+        // console.log(movies[0])
+        // console.log(movies.length)
+        // MovieController.geoCodeTest(movies[1], function(err, results){
+        //     req.json({
+        //         confimation:'fail',
+        //         results: err
+        //     })
+        // })
+
+        for(let i = 0; i < movies.length; i=i+1){
+            console.log('i====' + i)
+            MovieController.saveOneMovie(movies[i], function(err, results){
+                if(!err){
+                    console.log("movie " + i + " inserted")
+                }
+                else{
+                    console.log('error happend')
+                    console.log(err)                    
+                }
+            })
+        }
+        res.json({
+            confirmation:'success',
+            results: 'finished'
+        })
+        return
+    }
+    else if(resource == 'load-all-markers'){
+        console.log('start loading markers')
+        MovieController.findAll(req.params,function(err, results){
+            if(!err){
+                console.log('markers loaded')
                 res.json({
-                    confirmation:'fail',
-                    message : err
+                    confimation: 'success',
+                    results:results
                 })
                 return
             }
-            res.json({
-                confirmation:'success',
-                results: results
-            })
+            else
+                res.json({
+                    confimation: 'fail',
+                    results:'fail'
+                })
         })
     }
 })
@@ -52,6 +86,7 @@ router.get('/:resource/:name', function(req, res, next){
         })
     }
 })
+
 
 router.post('/:resource', function(req, res, next){
     let resource = req.params.resource;

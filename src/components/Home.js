@@ -6,9 +6,54 @@ import Autocomplete from 'react-google-autocomplete'
 
 class Home extends Component {
 
+    constructor(){
+        super()
+        this.state = {
+            markers: [
+            {
+                location: {
+                    lat:37.775550, 
+                    lng:-122.419395
+                }
+            },
+            {
+                location: {
+                    lat:37.772550, 
+                    lng:-122.420395
+                }
+            }]
+        }
+    }
+
     
     componentDidMount(){
-        console.log('component did mount')
+        console.log('component did mount in Home')
+        let newState = this.state
+        superagent
+        .get('/api/load-all-markers')
+        .query(null)
+        .set('Accept', 'application/json')
+        .end((err, response) =>{
+            if(err)
+                alert('error loading markers')
+            //console.log(JSON.stringify(response))
+            // console.log(JSON.parse(response.text).results)
+            let results = JSON.parse(response.text).results
+            let markers = []
+            console.log('length of results', results.length)
+            results.forEach(function(movie) {
+                console.log(typeof(movie))
+                console.log(typeof(movie.locations))
+                console.log(movie.locations)
+                let lat = movie.locations[0].coord.lat
+                let lng = movie.locations[0].coord.lng
+                let dic_location = {location:{lat:lat, lng:lng}}
+                markers.push(dic_location)
+            }, this);
+            this.setState({
+                markers: markers
+            })
+        })
     }
 
     render(){
@@ -28,14 +73,14 @@ class Home extends Component {
             lng:-122.419395
         }
 
-        const markers = [
-            {
-                location: {
-                    lat:37.775550, 
-                    lng:-122.419395
-                }
-            }
-        ]
+        // const markers = [
+        //     {
+        //         location: {
+        //             lat:37.775550, 
+        //             lng:-122.419395
+        //         }
+        //     }
+        // ]
         return(
             <div className="container">
                 <div className="row">
@@ -59,7 +104,7 @@ class Home extends Component {
                             isMarkerShown
                             zoom = { 15 }
                             center={centerLocation} 
-                            markers={markers}
+                            markers={this.state.markers}
                             loadingElement={<div style={{ height: `100%` }} />}
                             containerElement={<div style={{ height: `400px` }} />}
                             mapElement={<div style={{ height: `100%` }} />}

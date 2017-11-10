@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
+import superagent from 'superagent'
 
 class Map extends Component {
 
@@ -10,6 +11,10 @@ class Map extends Component {
     }
   }
 
+  componentDidMount(){
+    console.log("component mounted in Map")
+
+  }
   mapMoved(){
     if(this.state.map!=null)
       console.log('move finished' + JSON.stringify(this.state.map.getCenter()));
