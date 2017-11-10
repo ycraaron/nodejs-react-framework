@@ -118,6 +118,16 @@ module.exports = {
         }
     },
 
+    getMovieName : function (params, callback){
+        Movie.distinct('title', function(err, results){
+            if(err)
+                callback(err, null)
+            console.log(results)
+            callback(null, results)
+            return
+        })
+    },
+
     geoCodeTest: function(movie, callback){
         let address = movie['locations']
         console.log('address is ' + address)
