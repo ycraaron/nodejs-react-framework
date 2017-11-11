@@ -25908,8 +25908,6 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(0);
@@ -25928,9 +25926,9 @@ var _superagent = __webpack_require__(364);
 
 var _superagent2 = _interopRequireDefault(_superagent);
 
-var _reactGoogleAutocomplete = __webpack_require__(370);
+var _reactAutocomplete = __webpack_require__(372);
 
-var _reactGoogleAutocomplete2 = _interopRequireDefault(_reactGoogleAutocomplete);
+var _reactAutocomplete2 = _interopRequireDefault(_reactAutocomplete);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -25949,16 +25947,19 @@ var Home = function (_Component) {
         var _this = _possibleConstructorReturn(this, (Home.__proto__ || Object.getPrototypeOf(Home)).call(this));
 
         _this.state = {
+            titles: [{ id: 'foo', label: 'foo' }, { id: 'bar', label: 'bar' }, { id: 'baz', label: 'baz' }],
+            zoom: 12,
+            center: {
+                lat: 37.755550,
+                lng: -122.405395
+            },
             markers: [{
                 location: {
                     lat: 37.775550,
                     lng: -122.419395
-                }
-            }, {
-                location: {
-                    lat: 37.772550,
-                    lng: -122.420395
-                }
+                },
+                title: '1',
+                active: 1
             }]
         };
         return _this;
@@ -25970,31 +25971,65 @@ var Home = function (_Component) {
             var _this2 = this;
 
             console.log('component did mount in Home');
-            var newState = this.state;
+
             _superagent2.default.get('/api/load-all-markers').query(null).set('Accept', 'application/json').end(function (err, response) {
                 if (err) alert('error loading markers');
                 //console.log(JSON.stringify(response))
                 // console.log(JSON.parse(response.text).results)
                 var results = JSON.parse(response.text).results;
                 var markers = [];
-                console.log('length of results', results.length);
+                // console.log('length of results', results.length)
                 results.forEach(function (movie) {
-                    console.log(typeof movie === 'undefined' ? 'undefined' : _typeof(movie));
-                    console.log(_typeof(movie.locations));
-                    console.log(movie.locations);
+                    // console.log(typeof(movie))
+                    // console.log(typeof(movie.locations))
+                    // console.log(movie.locations)
+                    var title = movie.title;
                     var lat = movie.locations[0].coord.lat;
                     var lng = movie.locations[0].coord.lng;
-                    var dic_location = { location: { lat: lat, lng: lng } };
+                    var dic_location = { location: { lat: lat, lng: lng }, title: title, active: 1 };
                     markers.push(dic_location);
                 }, _this2);
+                console.log('before');
+                console.log(markers);
                 _this2.setState({
                     markers: markers
                 });
+            });
+
+            var newState = this.state;
+            var newTitles = [];
+            _superagent2.default.get('/api/load-movie-names').query(null).set('Accept', 'application/json').end(function (err, response) {
+                if (err) alert('error loading movie names');
+                var results = JSON.parse(response.text).results;
+                console.log(results);
+                var i = 1;
+                results.forEach(function (title) {
+                    var dic_title = { id: i, label: title };
+                    newTitles.push(dic_title);
+                    i += 1;
+                }, _this2);
+            });
+            this.setState({
+                titles: newTitles
+            });
+        }
+    }, {
+        key: 'searchFilm',
+        value: function searchFilm(title) {
+            var newMarkers = this.state.markers;
+            newMarkers.forEach(function (marker) {
+                if (marker.title != title) marker.active = 0;else if (marker.title == title) marker.active = 1;
+            }, this);
+            console.log('new markers');
+            console.log(newMarkers);
+            this.setState({
+                markers: newMarkers
             });
         }
     }, {
         key: 'render',
         value: function render() {
+            var _this3 = this;
 
             // let geocoder = new google.maps.Geocoder()
             // geocoder.geocode({'address': "Mason & California Streets (Nob Hill)"}, function(results, status) {
@@ -26005,20 +26040,15 @@ var Home = function (_Component) {
             //       alert('Geocode was not successfull because ' + status)
             //     }
             //   })
-
-            var centerLocation = {
-                lat: 37.775550,
-                lng: -122.419395
-
-                // const markers = [
-                //     {
-                //         location: {
-                //             lat:37.775550, 
-                //             lng:-122.419395
-                //         }
-                //     }
-                // ]
-            };return _react2.default.createElement(
+            // const markers = [
+            //     {
+            //         location: {
+            //             lat:37.775550, 
+            //             lng:-122.419395
+            //         }
+            //     }
+            // ]
+            return _react2.default.createElement(
                 'div',
                 { className: 'container' },
                 _react2.default.createElement(
@@ -26027,16 +26057,41 @@ var Home = function (_Component) {
                     _react2.default.createElement(
                         'div',
                         { className: 'col-md-4' },
-                        _react2.default.createElement(_SearchBar2.default, null),
-                        _react2.default.createElement('br', null),
-                        _react2.default.createElement(_reactGoogleAutocomplete2.default, {
-                            style: { width: '90%' },
-                            onPlaceSelected: function onPlaceSelected(place) {
-                                console.log(place);
+                        _react2.default.createElement(_reactAutocomplete2.default, {
+                            items: this.state.titles,
+                            shouldItemRender: function shouldItemRender(item, value) {
+                                return item.label.toLowerCase().indexOf(value.toLowerCase()) > -1;
                             },
-                            types: ['(regions)'],
-                            componentRestrictions: { country: "us" }
-                        })
+                            getItemValue: function getItemValue(item) {
+                                return item.label;
+                            },
+                            renderItem: function renderItem(item, highlighted) {
+                                return _react2.default.createElement(
+                                    'div',
+                                    {
+                                        key: item.id,
+                                        style: { backgroundColor: highlighted ? '#eee' : 'transparent' }
+                                    },
+                                    item.label
+                                );
+                            },
+                            value: this.state.value,
+                            onChange: function onChange(e) {
+                                return _this3.setState({ value: e.target.value });
+                            },
+                            onSelect: function onSelect(value) {
+                                return _this3.searchFilm(value);
+                            }
+                        }),
+                        _react2.default.createElement('br', null),
+                        _react2.default.createElement(
+                            'button',
+                            {
+                                onClick: this.searchFilm.bind(this),
+                                className: 'btn btn-info' },
+                            ' Search '
+                        ),
+                        _react2.default.createElement('br', null)
                     ),
                     _react2.default.createElement(
                         'div',
@@ -26044,11 +26099,11 @@ var Home = function (_Component) {
                         'Right Side Map',
                         _react2.default.createElement(_Gmap2.default, {
                             isMarkerShown: true,
-                            zoom: 15,
-                            center: centerLocation,
+                            zoom: this.state.zoom,
+                            center: this.state.center,
                             markers: this.state.markers,
                             loadingElement: _react2.default.createElement('div', { style: { height: '100%' } }),
-                            containerElement: _react2.default.createElement('div', { style: { height: '400px' } }),
+                            containerElement: _react2.default.createElement('div', { style: { height: '800px' } }),
                             mapElement: _react2.default.createElement('div', { style: { height: '100%' } })
                         })
                     )
@@ -26128,17 +26183,26 @@ var Map = function (_Component) {
   }, {
     key: 'render',
     value: function render() {
-      // const markers = this.props.markers.map((venue, i )=>{
-      //     const marker = {
-      //         position:{
-      //             lat: venue.location.lat,
-      //             lng: venue.location.lng
-      //         }
-      //     }
-      //     return <Marker key={i} position = {marker.position} />
-      // })
-      var markers = this.props.markers || [];
-      console.log(markers);
+      var markers = this.props.markers.map(function (item, i) {
+        // console.log('111')
+        // console.log(item.location)
+        // console.log(item.location.lat)
+        // console.log(item.location.title)
+        // console.log(item.locaiton.lat)
+        // console.log(item.location.lng)
+        // console.log(item.location.active)
+        var marker = {
+          position: {
+            lat: item.location.lat,
+            lng: item.location.lng
+          },
+          active: item.active,
+          title: item.title
+          // console.log(marker)
+        };if (marker.active == '1') return _react2.default.createElement(_reactGoogleMaps.Marker, { key: i, position: marker.position });
+      });
+      // const markers = this.props.markers || []
+      // console.log(markers);
       var center = this.props.center;
       var zoom = this.props.zoom;
 
@@ -26153,12 +26217,7 @@ var Map = function (_Component) {
           onDragEnd: this.mapMoved.bind(this),
           defaultZoom: zoom,
           defaultCenter: center },
-        markers.map(function (marker, index) {
-          return _react2.default.createElement(_reactGoogleMaps.Marker, {
-            key: index,
-            position: { lat: marker.location.lat, lng: marker.location.lng }
-          });
-        })
+        markers
       );
     }
   }]);
@@ -39783,42 +39842,17 @@ module.exports = Agent;
 
 
 /***/ }),
-/* 370 */
+/* 370 */,
+/* 371 */,
+/* 372 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-
-
-module.exports = __webpack_require__(371);
-
-
-/***/ }),
-/* 371 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ReactCustomGoogleAutocomplete = undefined;
+/* WEBPACK VAR INJECTION */(function(global) {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-var _propTypes = __webpack_require__(1);
-
-var _propTypes2 = _interopRequireDefault(_propTypes);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -39826,159 +39860,1179 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var ReactGoogleAutocomplete = function (_React$Component) {
-  _inherits(ReactGoogleAutocomplete, _React$Component);
+var React = __webpack_require__(0);
+var PropTypes = __webpack_require__(1);
 
-  function ReactGoogleAutocomplete(props) {
-    _classCallCheck(this, ReactGoogleAutocomplete);
+var _require = __webpack_require__(59),
+    findDOMNode = _require.findDOMNode;
 
-    var _this = _possibleConstructorReturn(this, (ReactGoogleAutocomplete.__proto__ || Object.getPrototypeOf(ReactGoogleAutocomplete)).call(this, props));
+var scrollIntoView = __webpack_require__(373);
 
-    _this.autocomplete = null;
-    _this.event = null;
+var IMPERATIVE_API = ['blur', 'checkValidity', 'click', 'focus', 'select', 'setCustomValidity', 'setSelectionRange', 'setRangeText'];
+
+function getScrollOffset() {
+  return {
+    x: window.pageXOffset !== undefined ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft,
+    y: window.pageYOffset !== undefined ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop
+  };
+}
+
+var Autocomplete = function (_React$Component) {
+  _inherits(Autocomplete, _React$Component);
+
+  function Autocomplete(props) {
+    _classCallCheck(this, Autocomplete);
+
+    var _this = _possibleConstructorReturn(this, (Autocomplete.__proto__ || Object.getPrototypeOf(Autocomplete)).call(this, props));
+
+    _this.state = {
+      isOpen: false,
+      highlightedIndex: null
+    };
+    _this._debugStates = [];
+    _this.ensureHighlightedIndex = _this.ensureHighlightedIndex.bind(_this);
+    _this.exposeAPI = _this.exposeAPI.bind(_this);
+    _this.handleInputFocus = _this.handleInputFocus.bind(_this);
+    _this.handleInputBlur = _this.handleInputBlur.bind(_this);
+    _this.handleChange = _this.handleChange.bind(_this);
+    _this.handleKeyDown = _this.handleKeyDown.bind(_this);
+    _this.handleInputClick = _this.handleInputClick.bind(_this);
+    _this.maybeAutoCompleteText = _this.maybeAutoCompleteText.bind(_this);
     return _this;
   }
 
-  _createClass(ReactGoogleAutocomplete, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var _props = this.props,
-          _props$types = _props.types,
-          types = _props$types === undefined ? ['(cities)'] : _props$types,
-          componentRestrictions = _props.componentRestrictions,
-          bounds = _props.bounds;
-
-      var config = {
-        types: types,
-        bounds: bounds
-      };
-
-      if (componentRestrictions) {
-        config.componentRestrictions = componentRestrictions;
-      }
-
-      this.autocomplete = new google.maps.places.Autocomplete(this.refs.input, config);
-
-      this.event = this.autocomplete.addListener('place_changed', this.onSelected.bind(this));
+  _createClass(Autocomplete, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      // this.refs is frozen, so we need to assign a new object to it
+      this.refs = {};
+      this._ignoreBlur = false;
+      this._ignoreFocus = false;
+      this._scrollOffset = null;
+      this._scrollTimer = null;
     }
   }, {
     key: 'componentWillUnmount',
     value: function componentWillUnmount() {
-      this.event.remove();
+      clearTimeout(this._scrollTimer);
+      this._scrollTimer = null;
     }
   }, {
-    key: 'onSelected',
-    value: function onSelected() {
-      if (this.props.onPlaceSelected) {
-        this.props.onPlaceSelected(this.autocomplete.getPlace());
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      if (this.state.highlightedIndex !== null) {
+        this.setState(this.ensureHighlightedIndex);
       }
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _props2 = this.props,
-          onPlaceSelected = _props2.onPlaceSelected,
-          types = _props2.types,
-          componentRestrictions = _props2.componentRestrictions,
-          bounds = _props2.bounds,
-          rest = _objectWithoutProperties(_props2, ['onPlaceSelected', 'types', 'componentRestrictions', 'bounds']);
-
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement('input', _extends({
-          ref: 'input'
-        }, rest))
-      );
-    }
-  }]);
-
-  return ReactGoogleAutocomplete;
-}(_react2.default.Component);
-
-ReactGoogleAutocomplete.propTypes = {
-  onPlaceSelected: _propTypes2.default.func,
-  types: _propTypes2.default.array,
-  componentRestrictions: _propTypes2.default.object,
-  bounds: _propTypes2.default.object
-};
-exports.default = ReactGoogleAutocomplete;
-
-var ReactCustomGoogleAutocomplete = exports.ReactCustomGoogleAutocomplete = function (_React$Component2) {
-  _inherits(ReactCustomGoogleAutocomplete, _React$Component2);
-
-  function ReactCustomGoogleAutocomplete(props) {
-    _classCallCheck(this, ReactCustomGoogleAutocomplete);
-
-    var _this2 = _possibleConstructorReturn(this, (ReactCustomGoogleAutocomplete.__proto__ || Object.getPrototypeOf(ReactCustomGoogleAutocomplete)).call(this, props));
-
-    _this2.service = new google.maps.places.AutocompleteService();
-    return _this2;
-  }
-
-  _createClass(ReactCustomGoogleAutocomplete, [{
-    key: 'onChange',
-    value: function onChange(e) {
-      var _this3 = this;
-
-      var _props$types2 = this.props.types,
-          types = _props$types2 === undefined ? ['(cities)'] : _props$types2;
-
-
-      if (e.target.value) {
-        this.service.getPlacePredictions({ input: e.target.value, types: types }, function (predictions, status) {
-          if (status === 'OK' && predictions && predictions.length > 0) {
-            _this3.props.onOpen(predictions);
-            console.log(predictions);
-          } else {
-            _this3.props.onClose();
-          }
-        });
-      } else {
-        this.props.onClose();
+      if (nextProps.autoHighlight && (this.props.value !== nextProps.value || this.state.highlightedIndex === null)) {
+        this.setState(this.maybeAutoCompleteText);
       }
     }
   }, {
     key: 'componentDidMount',
     value: function componentDidMount() {
-      var _this4 = this;
+      if (this.isOpen()) {
+        this.setMenuPositions();
+      }
+    }
+  }, {
+    key: 'componentDidUpdate',
+    value: function componentDidUpdate(prevProps, prevState) {
+      if (this.state.isOpen && !prevState.isOpen || 'open' in this.props && this.props.open && !prevProps.open) this.setMenuPositions();
 
-      if (this.props.input.value) {
-        this.placeService = new google.maps.places.PlacesService(this.refs.div);
-        this.placeService.getDetails({ placeId: this.props.input.value }, function (e, status) {
-          if (status === 'OK') {
-            _this4.refs.input.value = e.formatted_address;
-          }
+      this.maybeScrollItemIntoView();
+      if (prevState.isOpen !== this.state.isOpen) {
+        this.props.onMenuVisibilityChange(this.state.isOpen);
+      }
+    }
+  }, {
+    key: 'exposeAPI',
+    value: function exposeAPI(el) {
+      var _this2 = this;
+
+      this.refs.input = el;
+      IMPERATIVE_API.forEach(function (ev) {
+        return _this2[ev] = el && el[ev] && el[ev].bind(el);
+      });
+    }
+  }, {
+    key: 'maybeScrollItemIntoView',
+    value: function maybeScrollItemIntoView() {
+      if (this.isOpen() && this.state.highlightedIndex !== null) {
+        var itemNode = this.refs['item-' + this.state.highlightedIndex];
+        var menuNode = this.refs.menu;
+        scrollIntoView(findDOMNode(itemNode), findDOMNode(menuNode), { onlyScrollIfNeeded: true });
+      }
+    }
+  }, {
+    key: 'handleKeyDown',
+    value: function handleKeyDown(event) {
+      if (Autocomplete.keyDownHandlers[event.key]) Autocomplete.keyDownHandlers[event.key].call(this, event);else if (!this.isOpen()) {
+        this.setState({
+          isOpen: true
         });
       }
     }
   }, {
-    key: 'render',
-    value: function render() {
+    key: 'handleChange',
+    value: function handleChange(event) {
+      this.props.onChange(event, event.target.value);
+    }
+  }, {
+    key: 'getFilteredItems',
+    value: function getFilteredItems(props) {
+      var items = props.items;
+
+      if (props.shouldItemRender) {
+        items = items.filter(function (item) {
+          return props.shouldItemRender(item, props.value);
+        });
+      }
+
+      if (props.sortItems) {
+        items.sort(function (a, b) {
+          return props.sortItems(a, b, props.value);
+        });
+      }
+
+      return items;
+    }
+  }, {
+    key: 'maybeAutoCompleteText',
+    value: function maybeAutoCompleteText(state, props) {
+      var highlightedIndex = state.highlightedIndex;
+      var value = props.value,
+          getItemValue = props.getItemValue;
+
+      var index = highlightedIndex === null ? 0 : highlightedIndex;
+      var matchedItem = this.getFilteredItems(props)[index];
+      if (value !== '' && matchedItem) {
+        var itemValue = getItemValue(matchedItem);
+        var itemValueDoesMatch = itemValue.toLowerCase().indexOf(value.toLowerCase()) === 0;
+        if (itemValueDoesMatch) {
+          return { highlightedIndex: index };
+        }
+      }
+      return { highlightedIndex: null };
+    }
+  }, {
+    key: 'ensureHighlightedIndex',
+    value: function ensureHighlightedIndex(state, props) {
+      if (state.highlightedIndex >= this.getFilteredItems(props).length) {
+        return { highlightedIndex: null };
+      }
+    }
+  }, {
+    key: 'setMenuPositions',
+    value: function setMenuPositions() {
+      var node = this.refs.input;
+      var rect = node.getBoundingClientRect();
+      var computedStyle = global.window.getComputedStyle(node);
+      var marginBottom = parseInt(computedStyle.marginBottom, 10) || 0;
+      var marginLeft = parseInt(computedStyle.marginLeft, 10) || 0;
+      var marginRight = parseInt(computedStyle.marginRight, 10) || 0;
+      this.setState({
+        menuTop: rect.bottom + marginBottom,
+        menuLeft: rect.left + marginLeft,
+        menuWidth: rect.width + marginLeft + marginRight
+      });
+    }
+  }, {
+    key: 'highlightItemFromMouse',
+    value: function highlightItemFromMouse(index) {
+      this.setState({ highlightedIndex: index });
+    }
+  }, {
+    key: 'selectItemFromMouse',
+    value: function selectItemFromMouse(item) {
+      var _this3 = this;
+
+      var value = this.props.getItemValue(item);
+      // The menu will de-render before a mouseLeave event
+      // happens. Clear the flag to release control over focus
+      this.setIgnoreBlur(false);
+      this.setState({
+        isOpen: false,
+        highlightedIndex: null
+      }, function () {
+        _this3.props.onSelect(value, item);
+      });
+    }
+  }, {
+    key: 'setIgnoreBlur',
+    value: function setIgnoreBlur(ignore) {
+      this._ignoreBlur = ignore;
+    }
+  }, {
+    key: 'renderMenu',
+    value: function renderMenu() {
+      var _this4 = this;
+
+      var items = this.getFilteredItems(this.props).map(function (item, index) {
+        var element = _this4.props.renderItem(item, _this4.state.highlightedIndex === index, { cursor: 'default' });
+        return React.cloneElement(element, {
+          onMouseEnter: function onMouseEnter() {
+            return _this4.highlightItemFromMouse(index);
+          },
+          onClick: function onClick() {
+            return _this4.selectItemFromMouse(item);
+          },
+          ref: function ref(e) {
+            return _this4.refs['item-' + index] = e;
+          }
+        });
+      });
+      var style = {
+        left: this.state.menuLeft,
+        top: this.state.menuTop,
+        minWidth: this.state.menuWidth
+      };
+      var menu = this.props.renderMenu(items, this.props.value, style);
+      return React.cloneElement(menu, {
+        ref: function ref(e) {
+          return _this4.refs.menu = e;
+        },
+        // Ignore blur to prevent menu from de-rendering before we can process click
+        onMouseEnter: function onMouseEnter() {
+          return _this4.setIgnoreBlur(true);
+        },
+        onMouseLeave: function onMouseLeave() {
+          return _this4.setIgnoreBlur(false);
+        }
+      });
+    }
+  }, {
+    key: 'handleInputBlur',
+    value: function handleInputBlur(event) {
       var _this5 = this;
 
-      return _react2.default.createElement(
+      if (this._ignoreBlur) {
+        this._ignoreFocus = true;
+        this._scrollOffset = getScrollOffset();
+        this.refs.input.focus();
+        return;
+      }
+      var setStateCallback = void 0;
+      var highlightedIndex = this.state.highlightedIndex;
+
+      if (this.props.selectOnBlur && highlightedIndex !== null) {
+        var items = this.getFilteredItems(this.props);
+        var item = items[highlightedIndex];
+        var value = this.props.getItemValue(item);
+        setStateCallback = function setStateCallback() {
+          return _this5.props.onSelect(value, item);
+        };
+      }
+      this.setState({
+        isOpen: false,
+        highlightedIndex: null
+      }, setStateCallback);
+      var onBlur = this.props.inputProps.onBlur;
+
+      if (onBlur) {
+        onBlur(event);
+      }
+    }
+  }, {
+    key: 'handleInputFocus',
+    value: function handleInputFocus(event) {
+      var _this6 = this;
+
+      if (this._ignoreFocus) {
+        this._ignoreFocus = false;
+        var _scrollOffset = this._scrollOffset,
+            x = _scrollOffset.x,
+            y = _scrollOffset.y;
+
+        this._scrollOffset = null;
+        // Focus will cause the browser to scroll the <input> into view.
+        // This can cause the mouse coords to change, which in turn
+        // could cause a new highlight to happen, cancelling the click
+        // event (when selecting with the mouse)
+        window.scrollTo(x, y);
+        // Some browsers wait until all focus event handlers have been
+        // processed before scrolling the <input> into view, so let's
+        // scroll again on the next tick to ensure we're back to where
+        // the user was before focus was lost. We could do the deferred
+        // scroll only, but that causes a jarring split second jump in
+        // some browsers that scroll before the focus event handlers
+        // are triggered.
+        clearTimeout(this._scrollTimer);
+        this._scrollTimer = setTimeout(function () {
+          _this6._scrollTimer = null;
+          window.scrollTo(x, y);
+        }, 0);
+        return;
+      }
+      this.setState({ isOpen: true });
+      var onFocus = this.props.inputProps.onFocus;
+
+      if (onFocus) {
+        onFocus(event);
+      }
+    }
+  }, {
+    key: 'isInputFocused',
+    value: function isInputFocused() {
+      var el = this.refs.input;
+      return el.ownerDocument && el === el.ownerDocument.activeElement;
+    }
+  }, {
+    key: 'handleInputClick',
+    value: function handleInputClick() {
+      // Input will not be focused if it's disabled
+      if (this.isInputFocused() && !this.isOpen()) this.setState({ isOpen: true });
+    }
+  }, {
+    key: 'composeEventHandlers',
+    value: function composeEventHandlers(internal, external) {
+      return external ? function (e) {
+        internal(e);external(e);
+      } : internal;
+    }
+  }, {
+    key: 'isOpen',
+    value: function isOpen() {
+      return 'open' in this.props ? this.props.open : this.state.isOpen;
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      if (this.props.debug) {
+        // you don't like it, you love it
+        this._debugStates.push({
+          id: this._debugStates.length,
+          state: this.state
+        });
+      }
+
+      var inputProps = this.props.inputProps;
+
+      var open = this.isOpen();
+      return React.createElement(
         'div',
-        null,
-        _react2.default.cloneElement(this.props.input, _extends({}, this.props, {
-          ref: 'input',
-          onChange: function onChange(e) {
-            _this5.onChange(e);
-          }
+        _extends({ style: _extends({}, this.props.wrapperStyle) }, this.props.wrapperProps),
+        this.props.renderInput(_extends({}, inputProps, {
+          role: 'combobox',
+          'aria-autocomplete': 'list',
+          'aria-expanded': open,
+          autoComplete: 'off',
+          ref: this.exposeAPI,
+          onFocus: this.handleInputFocus,
+          onBlur: this.handleInputBlur,
+          onChange: this.handleChange,
+          onKeyDown: this.composeEventHandlers(this.handleKeyDown, inputProps.onKeyDown),
+          onClick: this.composeEventHandlers(this.handleInputClick, inputProps.onClick),
+          value: this.props.value
         })),
-        _react2.default.createElement('div', { ref: 'div' })
+        open && this.renderMenu(),
+        this.props.debug && React.createElement(
+          'pre',
+          { style: { marginLeft: 300 } },
+          JSON.stringify(this._debugStates.slice(Math.max(0, this._debugStates.length - 5), this._debugStates.length), null, 2)
+        )
       );
     }
   }]);
 
-  return ReactCustomGoogleAutocomplete;
-}(_react2.default.Component);
+  return Autocomplete;
+}(React.Component);
 
-ReactCustomGoogleAutocomplete.propTypes = {
-  input: _propTypes2.default.node.isRequired,
-  onOpen: _propTypes2.default.func.isRequired,
-  onClose: _propTypes2.default.func.isRequired
+Autocomplete.propTypes = {
+  /**
+   * The items to display in the dropdown menu
+   */
+  items: PropTypes.array.isRequired,
+  /**
+   * The value to display in the input field
+   */
+  value: PropTypes.any,
+  /**
+   * Arguments: `event: Event, value: String`
+   *
+   * Invoked every time the user changes the input's value.
+   */
+  onChange: PropTypes.func,
+  /**
+   * Arguments: `value: String, item: Any`
+   *
+   * Invoked when the user selects an item from the dropdown menu.
+   */
+  onSelect: PropTypes.func,
+  /**
+   * Arguments: `item: Any, value: String`
+   *
+   * Invoked for each entry in `items` and its return value is used to
+   * determine whether or not it should be displayed in the dropdown menu.
+   * By default all items are always rendered.
+   */
+  shouldItemRender: PropTypes.func,
+  /**
+   * Arguments: `itemA: Any, itemB: Any, value: String`
+   *
+   * The function which is used to sort `items` before display.
+   */
+  sortItems: PropTypes.func,
+  /**
+   * Arguments: `item: Any`
+   *
+   * Used to read the display value from each entry in `items`.
+   */
+  getItemValue: PropTypes.func.isRequired,
+  /**
+   * Arguments: `item: Any, isHighlighted: Boolean, styles: Object`
+   *
+   * Invoked for each entry in `items` that also passes `shouldItemRender` to
+   * generate the render tree for each item in the dropdown menu. `styles` is
+   * an optional set of styles that can be applied to improve the look/feel
+   * of the items in the dropdown menu.
+   */
+  renderItem: PropTypes.func.isRequired,
+  /**
+   * Arguments: `items: Array<Any>, value: String, styles: Object`
+   *
+   * Invoked to generate the render tree for the dropdown menu. Ensure the
+   * returned tree includes every entry in `items` or else the highlight order
+   * and keyboard navigation logic will break. `styles` will contain
+   * { top, left, minWidth } which are the coordinates of the top-left corner
+   * and the width of the dropdown menu.
+   */
+  renderMenu: PropTypes.func,
+  /**
+   * Styles that are applied to the dropdown menu in the default `renderMenu`
+   * implementation. If you override `renderMenu` and you want to use
+   * `menuStyle` you must manually apply them (`this.props.menuStyle`).
+   */
+  menuStyle: PropTypes.object,
+  /**
+   * Arguments: `props: Object`
+   *
+   * Invoked to generate the input element. The `props` argument is the result
+   * of merging `props.inputProps` with a selection of props that are required
+   * both for functionality and accessibility. At the very least you need to
+   * apply `props.ref` and all `props.on<event>` event handlers. Failing to do
+   * this will cause `Autocomplete` to behave unexpectedly.
+   */
+  renderInput: PropTypes.func,
+  /**
+   * Props passed to `props.renderInput`. By default these props will be
+   * applied to the `<input />` element rendered by `Autocomplete`, unless you
+   * have specified a custom value for `props.renderInput`. Any properties
+   * supported by `HTMLInputElement` can be specified, apart from the
+   * following which are set by `Autocomplete`: value, autoComplete, role,
+   * aria-autocomplete. `inputProps` is commonly used for (but not limited to)
+   * placeholder, event handlers (onFocus, onBlur, etc.), autoFocus, etc..
+   */
+  inputProps: PropTypes.object,
+  /**
+   * Props that are applied to the element which wraps the `<input />` and
+   * dropdown menu elements rendered by `Autocomplete`.
+   */
+  wrapperProps: PropTypes.object,
+  /**
+   * This is a shorthand for `wrapperProps={{ style: <your styles> }}`.
+   * Note that `wrapperStyle` is applied before `wrapperProps`, so the latter
+   * will win if it contains a `style` entry.
+   */
+  wrapperStyle: PropTypes.object,
+  /**
+   * Whether or not to automatically highlight the top match in the dropdown
+   * menu.
+   */
+  autoHighlight: PropTypes.bool,
+  /**
+   * Whether or not to automatically select the highlighted item when the
+   * `<input>` loses focus.
+   */
+  selectOnBlur: PropTypes.bool,
+  /**
+   * Arguments: `isOpen: Boolean`
+   *
+   * Invoked every time the dropdown menu's visibility changes (i.e. every
+   * time it is displayed/hidden).
+   */
+  onMenuVisibilityChange: PropTypes.func,
+  /**
+   * Used to override the internal logic which displays/hides the dropdown
+   * menu. This is useful if you want to force a certain state based on your
+   * UX/business logic. Use it together with `onMenuVisibilityChange` for
+   * fine-grained control over the dropdown menu dynamics.
+   */
+  open: PropTypes.bool,
+  debug: PropTypes.bool
 };
+Autocomplete.defaultProps = {
+  value: '',
+  wrapperProps: {},
+  wrapperStyle: {
+    display: 'inline-block'
+  },
+  inputProps: {},
+  renderInput: function renderInput(props) {
+    return React.createElement('input', props);
+  },
+  onChange: function onChange() {},
+  onSelect: function onSelect() {},
+  renderMenu: function renderMenu(items, value, style) {
+    return React.createElement('div', { style: _extends({}, style, this.menuStyle), children: items });
+  },
+
+  menuStyle: {
+    borderRadius: '3px',
+    boxShadow: '0 2px 12px rgba(0, 0, 0, 0.1)',
+    background: 'rgba(255, 255, 255, 0.9)',
+    padding: '2px 0',
+    fontSize: '90%',
+    position: 'fixed',
+    overflow: 'auto',
+    maxHeight: '50%' },
+  autoHighlight: true,
+  selectOnBlur: false,
+  onMenuVisibilityChange: function onMenuVisibilityChange() {}
+};
+Autocomplete.keyDownHandlers = {
+  ArrowDown: function ArrowDown(event) {
+    event.preventDefault();
+    var itemsLength = this.getFilteredItems(this.props).length;
+    if (!itemsLength) return;
+    var highlightedIndex = this.state.highlightedIndex;
+
+    var index = highlightedIndex === null || highlightedIndex === itemsLength - 1 ? 0 : highlightedIndex + 1;
+    this.setState({
+      highlightedIndex: index,
+      isOpen: true
+    });
+  },
+  ArrowUp: function ArrowUp(event) {
+    event.preventDefault();
+    var itemsLength = this.getFilteredItems(this.props).length;
+    if (!itemsLength) return;
+    var highlightedIndex = this.state.highlightedIndex;
+
+    var index = highlightedIndex === 0 || highlightedIndex === null ? itemsLength - 1 : highlightedIndex - 1;
+    this.setState({
+      highlightedIndex: index,
+      isOpen: true
+    });
+  },
+  Enter: function Enter(event) {
+    var _this7 = this;
+
+    // Key code 229 is used for selecting items from character selectors (Pinyin, Kana, etc)
+    if (event.keyCode !== 13) return;
+    if (!this.isOpen()) {
+      // menu is closed so there is no selection to accept -> do nothing
+      return;
+    } else if (this.state.highlightedIndex == null) {
+      // input has focus but no menu item is selected + enter is hit -> close the menu, highlight whatever's in input
+      this.setState({
+        isOpen: false
+      }, function () {
+        _this7.refs.input.select();
+      });
+    } else {
+      // text entered + menu item has been highlighted + enter is hit -> update value to that of selected menu item, close the menu
+      event.preventDefault();
+      var item = this.getFilteredItems(this.props)[this.state.highlightedIndex];
+      var value = this.props.getItemValue(item);
+      this.setState({
+        isOpen: false,
+        highlightedIndex: null
+      }, function () {
+        //this.refs.input.focus() // TODO: file issue
+        _this7.refs.input.setSelectionRange(value.length, value.length);
+        _this7.props.onSelect(value, item);
+      });
+    }
+  },
+  Escape: function Escape() {
+    // In case the user is currently hovering over the menu
+    this.setIgnoreBlur(false);
+    this.setState({
+      highlightedIndex: null,
+      isOpen: false
+    });
+  },
+  Tab: function Tab() {
+    // In case the user is currently hovering over the menu
+    this.setIgnoreBlur(false);
+  }
+};
+
+
+module.exports = Autocomplete;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(108)))
+
+/***/ }),
+/* 373 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(374);
+
+
+/***/ }),
+/* 374 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var util = __webpack_require__(375);
+
+function scrollIntoView(elem, container, config) {
+  config = config || {};
+  // document 归一化到 window
+  if (container.nodeType === 9) {
+    container = util.getWindow(container);
+  }
+
+  var allowHorizontalScroll = config.allowHorizontalScroll;
+  var onlyScrollIfNeeded = config.onlyScrollIfNeeded;
+  var alignWithTop = config.alignWithTop;
+  var alignWithLeft = config.alignWithLeft;
+
+  allowHorizontalScroll = allowHorizontalScroll === undefined ? true : allowHorizontalScroll;
+
+  var isWin = util.isWindow(container);
+  var elemOffset = util.offset(elem);
+  var eh = util.outerHeight(elem);
+  var ew = util.outerWidth(elem);
+  var containerOffset, ch, cw, containerScroll,
+    diffTop, diffBottom, win,
+    winScroll, ww, wh;
+
+  if (isWin) {
+    win = container;
+    wh = util.height(win);
+    ww = util.width(win);
+    winScroll = {
+      left: util.scrollLeft(win),
+      top: util.scrollTop(win)
+    };
+    // elem 相对 container 可视视窗的距离
+    diffTop = {
+      left: elemOffset.left - winScroll.left,
+      top: elemOffset.top - winScroll.top
+    };
+    diffBottom = {
+      left: elemOffset.left + ew - (winScroll.left + ww),
+      top: elemOffset.top + eh - (winScroll.top + wh)
+    };
+    containerScroll = winScroll;
+  } else {
+    containerOffset = util.offset(container);
+    ch = container.clientHeight;
+    cw = container.clientWidth;
+    containerScroll = {
+      left: container.scrollLeft,
+      top: container.scrollTop
+    };
+    // elem 相对 container 可视视窗的距离
+    // 注意边框, offset 是边框到根节点
+    diffTop = {
+      left: elemOffset.left - (containerOffset.left +
+      (parseFloat(util.css(container, 'borderLeftWidth')) || 0)),
+      top: elemOffset.top - (containerOffset.top +
+      (parseFloat(util.css(container, 'borderTopWidth')) || 0))
+    };
+    diffBottom = {
+      left: elemOffset.left + ew -
+      (containerOffset.left + cw +
+      (parseFloat(util.css(container, 'borderRightWidth')) || 0)),
+      top: elemOffset.top + eh -
+      (containerOffset.top + ch +
+      (parseFloat(util.css(container, 'borderBottomWidth')) || 0))
+    };
+  }
+
+  if (diffTop.top < 0 || diffBottom.top > 0) {
+    // 强制向上
+    if (alignWithTop === true) {
+      util.scrollTop(container, containerScroll.top + diffTop.top);
+    } else if (alignWithTop === false) {
+      util.scrollTop(container, containerScroll.top + diffBottom.top);
+    } else {
+      // 自动调整
+      if (diffTop.top < 0) {
+        util.scrollTop(container, containerScroll.top + diffTop.top);
+      } else {
+        util.scrollTop(container, containerScroll.top + diffBottom.top);
+      }
+    }
+  } else {
+    if (!onlyScrollIfNeeded) {
+      alignWithTop = alignWithTop === undefined ? true : !!alignWithTop;
+      if (alignWithTop) {
+        util.scrollTop(container, containerScroll.top + diffTop.top);
+      } else {
+        util.scrollTop(container, containerScroll.top + diffBottom.top);
+      }
+    }
+  }
+
+  if (allowHorizontalScroll) {
+    if (diffTop.left < 0 || diffBottom.left > 0) {
+      // 强制向上
+      if (alignWithLeft === true) {
+        util.scrollLeft(container, containerScroll.left + diffTop.left);
+      } else if (alignWithLeft === false) {
+        util.scrollLeft(container, containerScroll.left + diffBottom.left);
+      } else {
+        // 自动调整
+        if (diffTop.left < 0) {
+          util.scrollLeft(container, containerScroll.left + diffTop.left);
+        } else {
+          util.scrollLeft(container, containerScroll.left + diffBottom.left);
+        }
+      }
+    } else {
+      if (!onlyScrollIfNeeded) {
+        alignWithLeft = alignWithLeft === undefined ? true : !!alignWithLeft;
+        if (alignWithLeft) {
+          util.scrollLeft(container, containerScroll.left + diffTop.left);
+        } else {
+          util.scrollLeft(container, containerScroll.left + diffBottom.left);
+        }
+      }
+    }
+  }
+}
+
+module.exports = scrollIntoView;
+
+
+/***/ }),
+/* 375 */
+/***/ (function(module, exports) {
+
+var RE_NUM = /[\-+]?(?:\d*\.|)\d+(?:[eE][\-+]?\d+|)/.source;
+
+function getClientPosition(elem) {
+  var box, x, y;
+  var doc = elem.ownerDocument;
+  var body = doc.body;
+  var docElem = doc && doc.documentElement;
+  // 根据 GBS 最新数据，A-Grade Browsers 都已支持 getBoundingClientRect 方法，不用再考虑传统的实现方式
+  box = elem.getBoundingClientRect();
+
+  // 注：jQuery 还考虑减去 docElem.clientLeft/clientTop
+  // 但测试发现，这样反而会导致当 html 和 body 有边距/边框样式时，获取的值不正确
+  // 此外，ie6 会忽略 html 的 margin 值，幸运地是没有谁会去设置 html 的 margin
+
+  x = box.left;
+  y = box.top;
+
+  // In IE, most of the time, 2 extra pixels are added to the top and left
+  // due to the implicit 2-pixel inset border.  In IE6/7 quirks mode and
+  // IE6 standards mode, this border can be overridden by setting the
+  // document element's border to zero -- thus, we cannot rely on the
+  // offset always being 2 pixels.
+
+  // In quirks mode, the offset can be determined by querying the body's
+  // clientLeft/clientTop, but in standards mode, it is found by querying
+  // the document element's clientLeft/clientTop.  Since we already called
+  // getClientBoundingRect we have already forced a reflow, so it is not
+  // too expensive just to query them all.
+
+  // ie 下应该减去窗口的边框吧，毕竟默认 absolute 都是相对窗口定位的
+  // 窗口边框标准是设 documentElement ,quirks 时设置 body
+  // 最好禁止在 body 和 html 上边框 ，但 ie < 9 html 默认有 2px ，减去
+  // 但是非 ie 不可能设置窗口边框，body html 也不是窗口 ,ie 可以通过 html,body 设置
+  // 标准 ie 下 docElem.clientTop 就是 border-top
+  // ie7 html 即窗口边框改变不了。永远为 2
+  // 但标准 firefox/chrome/ie9 下 docElem.clientTop 是窗口边框，即使设了 border-top 也为 0
+
+  x -= docElem.clientLeft || body.clientLeft || 0;
+  y -= docElem.clientTop || body.clientTop || 0;
+
+  return {left: x, top: y};
+}
+
+function getScroll(w, top) {
+  var ret = w['page' + (top ? 'Y' : 'X') + 'Offset'];
+  var method = 'scroll' + (top ? 'Top' : 'Left');
+  if (typeof ret !== 'number') {
+    var d = w.document;
+    //ie6,7,8 standard mode
+    ret = d.documentElement[method];
+    if (typeof ret !== 'number') {
+      //quirks mode
+      ret = d.body[method];
+    }
+  }
+  return ret;
+}
+
+function getScrollLeft(w) {
+  return getScroll(w);
+}
+
+function getScrollTop(w) {
+  return getScroll(w, true);
+}
+
+function getOffset(el) {
+  var pos = getClientPosition(el);
+  var doc = el.ownerDocument;
+  var w = doc.defaultView || doc.parentWindow;
+  pos.left += getScrollLeft(w);
+  pos.top += getScrollTop(w);
+  return pos;
+}
+function _getComputedStyle(elem, name, computedStyle) {
+  var val = '';
+  var d = elem.ownerDocument;
+
+  // https://github.com/kissyteam/kissy/issues/61
+  if ((computedStyle = (computedStyle || d.defaultView.getComputedStyle(elem, null)))) {
+    val = computedStyle.getPropertyValue(name) || computedStyle[name];
+  }
+
+  return val;
+}
+
+var _RE_NUM_NO_PX = new RegExp('^(' + RE_NUM + ')(?!px)[a-z%]+$', 'i');
+var RE_POS = /^(top|right|bottom|left)$/,
+  CURRENT_STYLE = 'currentStyle',
+  RUNTIME_STYLE = 'runtimeStyle',
+  LEFT = 'left',
+  PX = 'px';
+
+function _getComputedStyleIE(elem, name) {
+  // currentStyle maybe null
+  // http://msdn.microsoft.com/en-us/library/ms535231.aspx
+  var ret = elem[CURRENT_STYLE] && elem[CURRENT_STYLE][name];
+
+  // 当 width/height 设置为百分比时，通过 pixelLeft 方式转换的 width/height 值
+  // 一开始就处理了! CUSTOM_STYLE.height,CUSTOM_STYLE.width ,cssHook 解决@2011-08-19
+  // 在 ie 下不对，需要直接用 offset 方式
+  // borderWidth 等值也有问题，但考虑到 borderWidth 设为百分比的概率很小，这里就不考虑了
+
+  // From the awesome hack by Dean Edwards
+  // http://erik.eae.net/archives/2007/07/27/18.54.15/#comment-102291
+  // If we're not dealing with a regular pixel number
+  // but a number that has a weird ending, we need to convert it to pixels
+  // exclude left right for relativity
+  if (_RE_NUM_NO_PX.test(ret) && !RE_POS.test(name)) {
+    // Remember the original values
+    var style = elem.style,
+      left = style[LEFT],
+      rsLeft = elem[RUNTIME_STYLE][LEFT];
+
+    // prevent flashing of content
+    elem[RUNTIME_STYLE][LEFT] = elem[CURRENT_STYLE][LEFT];
+
+    // Put in the new values to get a computed value out
+    style[LEFT] = name === 'fontSize' ? '1em' : (ret || 0);
+    ret = style.pixelLeft + PX;
+
+    // Revert the changed values
+    style[LEFT] = left;
+
+    elem[RUNTIME_STYLE][LEFT] = rsLeft;
+  }
+  return ret === '' ? 'auto' : ret;
+}
+
+var getComputedStyleX;
+if (typeof window !== 'undefined') {
+  getComputedStyleX = window.getComputedStyle ? _getComputedStyle : _getComputedStyleIE;
+}
+
+// 设置 elem 相对 elem.ownerDocument 的坐标
+function setOffset(elem, offset) {
+  // set position first, in-case top/left are set even on static elem
+  if (css(elem, 'position') === 'static') {
+    elem.style.position = 'relative';
+  }
+
+  var old = getOffset(elem),
+    ret = {},
+    current, key;
+
+  for (key in offset) {
+    current = parseFloat(css(elem, key)) || 0;
+    ret[key] = current + offset[key] - old[key];
+  }
+  css(elem, ret);
+}
+
+function each(arr, fn) {
+  for (var i = 0; i < arr.length; i++) {
+    fn(arr[i]);
+  }
+}
+
+function isBorderBoxFn(elem) {
+  return getComputedStyleX(elem, 'boxSizing') === 'border-box';
+}
+
+var BOX_MODELS = ['margin', 'border', 'padding'],
+  CONTENT_INDEX = -1,
+  PADDING_INDEX = 2,
+  BORDER_INDEX = 1,
+  MARGIN_INDEX = 0;
+
+function swap(elem, options, callback) {
+  var old = {},
+    style = elem.style,
+    name;
+
+  // Remember the old values, and insert the new ones
+  for (name in options) {
+    old[name] = style[name];
+    style[name] = options[name];
+  }
+
+  callback.call(elem);
+
+  // Revert the old values
+  for (name in options) {
+    style[name] = old[name];
+  }
+}
+
+function getPBMWidth(elem, props, which) {
+  var value = 0, prop, j, i;
+  for (j = 0; j < props.length; j++) {
+    prop = props[j];
+    if (prop) {
+      for (i = 0; i < which.length; i++) {
+        var cssProp;
+        if (prop === 'border') {
+          cssProp = prop + which[i] + 'Width';
+        } else {
+          cssProp = prop + which[i];
+        }
+        value += parseFloat(getComputedStyleX(elem, cssProp)) || 0;
+      }
+    }
+  }
+  return value;
+}
+
+/**
+ * A crude way of determining if an object is a window
+ * @member util
+ */
+function isWindow(obj) {
+  // must use == for ie8
+  /*jshint eqeqeq:false*/
+  return obj != null && obj == obj.window;
+}
+
+var domUtils = {};
+
+each(['Width', 'Height'], function (name) {
+  domUtils['doc' + name] = function (refWin) {
+    var d = refWin.document;
+    return Math.max(
+      //firefox chrome documentElement.scrollHeight< body.scrollHeight
+      //ie standard mode : documentElement.scrollHeight> body.scrollHeight
+      d.documentElement['scroll' + name],
+      //quirks : documentElement.scrollHeight 最大等于可视窗口多一点？
+      d.body['scroll' + name],
+      domUtils['viewport' + name](d));
+  };
+
+  domUtils['viewport' + name] = function (win) {
+    // pc browser includes scrollbar in window.innerWidth
+    var prop = 'client' + name,
+      doc = win.document,
+      body = doc.body,
+      documentElement = doc.documentElement,
+      documentElementProp = documentElement[prop];
+    // 标准模式取 documentElement
+    // backcompat 取 body
+    return doc.compatMode === 'CSS1Compat' && documentElementProp ||
+      body && body[prop] || documentElementProp;
+  };
+});
+
+/*
+ 得到元素的大小信息
+ @param elem
+ @param name
+ @param {String} [extra]  'padding' : (css width) + padding
+ 'border' : (css width) + padding + border
+ 'margin' : (css width) + padding + border + margin
+ */
+function getWH(elem, name, extra) {
+  if (isWindow(elem)) {
+    return name === 'width' ? domUtils.viewportWidth(elem) : domUtils.viewportHeight(elem);
+  } else if (elem.nodeType === 9) {
+    return name === 'width' ? domUtils.docWidth(elem) : domUtils.docHeight(elem);
+  }
+  var which = name === 'width' ? ['Left', 'Right'] : ['Top', 'Bottom'],
+    borderBoxValue = name === 'width' ? elem.offsetWidth : elem.offsetHeight;
+  var computedStyle = getComputedStyleX(elem);
+  var isBorderBox = isBorderBoxFn(elem, computedStyle);
+  var cssBoxValue = 0;
+  if (borderBoxValue == null || borderBoxValue <= 0) {
+    borderBoxValue = undefined;
+    // Fall back to computed then un computed css if necessary
+    cssBoxValue = getComputedStyleX(elem, name);
+    if (cssBoxValue == null || (Number(cssBoxValue)) < 0) {
+      cssBoxValue = elem.style[name] || 0;
+    }
+    // Normalize '', auto, and prepare for extra
+    cssBoxValue = parseFloat(cssBoxValue) || 0;
+  }
+  if (extra === undefined) {
+    extra = isBorderBox ? BORDER_INDEX : CONTENT_INDEX;
+  }
+  var borderBoxValueOrIsBorderBox = borderBoxValue !== undefined || isBorderBox;
+  var val = borderBoxValue || cssBoxValue;
+  if (extra === CONTENT_INDEX) {
+    if (borderBoxValueOrIsBorderBox) {
+      return val - getPBMWidth(elem, ['border', 'padding'],
+          which, computedStyle);
+    } else {
+      return cssBoxValue;
+    }
+  } else if (borderBoxValueOrIsBorderBox) {
+    return val + (extra === BORDER_INDEX ? 0 :
+        (extra === PADDING_INDEX ?
+          -getPBMWidth(elem, ['border'], which, computedStyle) :
+          getPBMWidth(elem, ['margin'], which, computedStyle)));
+  } else {
+    return cssBoxValue + getPBMWidth(elem, BOX_MODELS.slice(extra),
+        which, computedStyle);
+  }
+}
+
+var cssShow = {position: 'absolute', visibility: 'hidden', display: 'block'};
+
+// fix #119 : https://github.com/kissyteam/kissy/issues/119
+function getWHIgnoreDisplay(elem) {
+  var val, args = arguments;
+  // in case elem is window
+  // elem.offsetWidth === undefined
+  if (elem.offsetWidth !== 0) {
+    val = getWH.apply(undefined, args);
+  } else {
+    swap(elem, cssShow, function () {
+      val = getWH.apply(undefined, args);
+    });
+  }
+  return val;
+}
+
+each(['width', 'height'], function (name) {
+  var first = name.charAt(0).toUpperCase() + name.slice(1);
+  domUtils['outer' + first] = function (el, includeMargin) {
+    return el && getWHIgnoreDisplay(el, name, includeMargin ? MARGIN_INDEX : BORDER_INDEX);
+  };
+  var which = name === 'width' ? ['Left', 'Right'] : ['Top', 'Bottom'];
+
+  domUtils[name] = function (elem, val) {
+    if (val !== undefined) {
+      if (elem) {
+        var computedStyle = getComputedStyleX(elem);
+        var isBorderBox = isBorderBoxFn(elem);
+        if (isBorderBox) {
+          val += getPBMWidth(elem, ['padding', 'border'], which, computedStyle);
+        }
+        return css(elem, name, val);
+      }
+      return;
+    }
+    return elem && getWHIgnoreDisplay(elem, name, CONTENT_INDEX);
+  };
+});
+
+function css(el, name, value) {
+  if (typeof name === 'object') {
+    for (var i in name) {
+      css(el, i, name[i]);
+    }
+    return;
+  }
+  if (typeof value !== 'undefined') {
+    if (typeof value === 'number') {
+      value = value + 'px';
+    }
+    el.style[name] = value;
+  } else {
+    return getComputedStyleX(el, name);
+  }
+}
+
+function mix(to, from) {
+  for (var i in from) {
+    to[i] = from[i];
+  }
+  return to;
+}
+
+var utils = module.exports = {
+  getWindow: function (node) {
+    var doc = node.ownerDocument || node;
+    return doc.defaultView || doc.parentWindow;
+  },
+  offset: function (el, value) {
+    if (typeof value !== 'undefined') {
+      setOffset(el, value);
+    } else {
+      return getOffset(el);
+    }
+  },
+  isWindow: isWindow,
+  each: each,
+  css: css,
+  clone: function (obj) {
+    var ret = {};
+    for (var i in obj) {
+      ret[i] = obj[i];
+    }
+    var overflow = obj.overflow;
+    if (overflow) {
+      for (i in obj) {
+        ret.overflow[i] = obj.overflow[i];
+      }
+    }
+    return ret;
+  },
+  mix: mix,
+  scrollLeft: function (w, v) {
+    if (isWindow(w)) {
+      if (v === undefined) {
+        return getScrollLeft(w);
+      } else {
+        window.scrollTo(v, getScrollTop(w));
+      }
+    } else {
+      if (v === undefined) {
+        return w.scrollLeft;
+      } else {
+        w.scrollLeft = v;
+      }
+    }
+  },
+  scrollTop: function (w, v) {
+    if (isWindow(w)) {
+      if (v === undefined) {
+        return getScrollTop(w);
+      } else {
+        window.scrollTo(getScrollLeft(w), v);
+      }
+    } else {
+      if (v === undefined) {
+        return w.scrollTop;
+      } else {
+        w.scrollTop = v;
+      }
+    }
+  },
+  merge: function () {
+    var ret = {};
+    for (var i = 0; i < arguments.length; i++) {
+      utils.mix(ret, arguments[i]);
+    }
+    return ret;
+  },
+  viewportWidth: 0,
+  viewportHeight: 0
+};
+
+mix(utils, domUtils);
+
 
 /***/ })
 /******/ ]);

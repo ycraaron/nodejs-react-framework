@@ -66,6 +66,25 @@ router.get('/:resource', function(req, res, next){
                 })
         })
     }
+    else if (resource == 'load-movie-names'){
+        console.log('start loading movie names')
+        MovieController.getMovieName(req.params, function(err, results){
+            if(!err){
+                console.log('movie names loaded')
+                res.json({
+                    confirmation: 'success',
+                    results: results
+                })
+                return
+            }
+            else
+                res.json({
+                    confimation: 'fail',
+                    results:'fail'
+                })
+                return
+        })
+    }
 })
 
 router.get('/:resource/:name', function(req, res, next){

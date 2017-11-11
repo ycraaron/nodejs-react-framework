@@ -30,7 +30,7 @@ module.exports = {
 
     findAll : function(params, callback){
         console.log(params)
-        Movie.find({title:'180'}, function(err, movies){
+        Movie.find({}, function(err, movies){
             // error always first
             // payload second
             if (err){
@@ -122,7 +122,7 @@ module.exports = {
         Movie.distinct('title', function(err, results){
             if(err)
                 callback(err, null)
-            console.log(results)
+            // console.log(results)
             callback(null, results)
             return
         })
