@@ -4,11 +4,10 @@
 // var React = require('react')
 
 // es6
-// I like imports, just like python, embrace es6
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import Home from './components/Home'
-
+import Banner from './components/Banner'
 // class App extends Component {
 //     render(){
 //         return (
@@ -24,6 +23,7 @@ class App extends Component {
         return (
             <div>
                 <Home />
+                <Banner />                
             </div>
         )
     }

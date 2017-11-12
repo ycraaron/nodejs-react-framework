@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { withGoogleMap, GoogleMap, Marker } from 'react-google-maps';
 import superagent from 'superagent'
+import styles from './styles'
 
 class Map extends Component {
 
@@ -10,7 +11,7 @@ class Map extends Component {
       map: null
     }
   }
-
+  
   componentDidMount(){
     console.log("component mounted in Map")
 
@@ -30,40 +31,30 @@ class Map extends Component {
 
   render() {
     let markers = this.props.markers.map((item, i )=>{
-        // console.log('111')
-        // console.log(item.location)
-        // console.log(item.location.lat)
-        // console.log(item.location.title)
-        // console.log(item.locaiton.lat)
-        // console.log(item.location.lng)
-        // console.log(item.location.active)
         let marker = {
             position:{
                 lat: item.location.lat,
                 lng: item.location.lng
             },
             active: item.active,
-            title: item.title
+            title: item.title,
+            red: item.red
         }
-        // console.log(marker)
         if(marker.active == '1')
-          return <Marker key={i} position = {marker.position} />
+          if(marker.red == '1')
+            return <Marker key={i} position = {marker.position} icon={'./images/marker-red.png'} />
+          else
+            return <Marker key={i} position = {marker.position} icon={'./images/marker-blue.png'} />
     })
-    // const markers = this.props.markers || []
-    // console.log(markers);
     let center = this.props.center;
     let zoom = this.props.zoom;
-
-    // markers.map((marker, index) =>(
-    //     console.log(marker.location.lat)
-    // ))
-
     return (
         <GoogleMap
           ref = {this.mapLoaded.bind(this)}
           onDragEnd={this.mapMoved.bind(this)}
           defaultZoom={ zoom }
-          defaultCenter={ center }>
+          defaultCenter={ center }
+          defaultOptions={{ styles: styles.map }}>
           {markers}
           {/* {markers.map((marker, index) => (
             <Marker

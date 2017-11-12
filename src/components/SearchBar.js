@@ -7,6 +7,7 @@ class SearchBar extends Component {
 
         }
     }
+    
     searchFilm(){
         alert("I want to search")
         

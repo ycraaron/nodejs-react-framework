@@ -1,14 +1,11 @@
-// import {ZoneController} from '../controllers/ZoneController'
 let express = require('express');
 let router = express.Router();
-let ZoneController = require('../controllers/ZoneController');
 let MovieController = require('../controllers/MovieController')
 const fs = require('fs');
 
 router.get('/', function(req, res, next){
     
         const resouce = req.params.resource
-    
         res.json({
             confirmation:'root',
             resource: resouce
@@ -19,34 +16,29 @@ router.get('/', function(req, res, next){
 router.get('/:resource', function(req, res, next){
     let resource = req.params.resource
     if (resource == 'save-movie-to-mongo'){
-        let rawData = fs.readFileSync('./src/data/movie-part1.json')
-        let movies = JSON.parse(rawData)
-        // console.log(movies[0])
-        // console.log(movies.length)
-        // MovieController.geoCodeTest(movies[1], function(err, results){
-        //     req.json({
-        //         confimation:'fail',
-        //         results: err
+        // let rawData = fs.readFileSync('./src/data/movie-part1.json')
+        // let movies = JSON.parse(rawData)
+        // for(let i = 0; i < movies.length; i=i+1){
+        //     console.log('i====' + i)
+        //     MovieController.saveOneMovie(movies[i], function(err, results){
+        //         if(!err){
+        //             console.log("movie " + i + " inserted")
+        //         }
+        //         else{
+        //             console.log('error happend')
+        //             console.log(err)                    
+        //         }
         //     })
+        // }
+        // res.json({
+        //     confirmation:'success',
+        //     results: 'finished'
         // })
-
-        for(let i = 0; i < movies.length; i=i+1){
-            console.log('i====' + i)
-            MovieController.saveOneMovie(movies[i], function(err, results){
-                if(!err){
-                    console.log("movie " + i + " inserted")
-                }
-                else{
-                    console.log('error happend')
-                    console.log(err)                    
-                }
-            })
-        }
+        // return
         res.json({
             confirmation:'success',
-            results: 'finished'
+            results: 'api call disabled'
         })
-        return
     }
     else if(resource == 'load-all-markers'){
         console.log('start loading markers')
@@ -109,16 +101,8 @@ router.get('/:resource/:name', function(req, res, next){
 
 router.post('/:resource', function(req, res, next){
     let resource = req.params.resource;
-    if (resource == 'zone'){
-        ZoneController.create(req.body, function(err, result){
-            if (err){
-                res.json({
-                    confirmation: 'fail',
-                    message: err
-                })
-                return
-            }
-            
+    if (resource == 'movie'){
+        MovieController.create(req.body, function(err, result){            
             res.json({
                 confimation:'success',
                 result: result

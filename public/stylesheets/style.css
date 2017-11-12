@@ -1,8 +1,31 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  padding: 0px;
+  font: 15px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+.col-md-12 {
+  padding-right:0px;
+  padding-left:0px;
+}
+
+.col-md-11 {
+  padding-right:0px;
+  padding-left:10px;
+  background: #313030;
+}
+
+.col-md-1 {
+  padding-right:0px;
+  padding-left:0px;
+  background: #313030;
+}
+
+.col-md-3 {
+  padding-right:0px;
+  padding-left:30px;
+  background: #313030;
 }
