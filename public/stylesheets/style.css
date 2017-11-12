@@ -10,11 +10,12 @@ a {
 .col-md-12 {
   padding-right:0px;
   padding-left:0px;
+  background: #313030;
 }
 
 .col-md-11 {
   padding-right:0px;
-  padding-left:10px;
+  padding-left:20px;
   background: #313030;
 }
 
@@ -27,5 +28,11 @@ a {
 .col-md-3 {
   padding-right:0px;
   padding-left:30px;
+  background: #313030;
+}
+
+.container-fluid{
+  padding-left:5px;
+  padding-right:5px;
   background: #313030;
 }

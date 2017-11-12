@@ -21,7 +21,7 @@ import Banner from './components/Banner'
 class App extends Component {
     render(){
         return (
-            <div>
+            <div className="container-fluid">
                 <Home />
                 <Banner />                
             </div>
