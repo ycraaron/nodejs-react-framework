@@ -151,7 +151,7 @@ class Home extends Component {
                             center={ this.state.center } 
                             markers={ this.state.markers }
                             loadingElement={<div style={{ height: `100%` }} />}
-                            containerElement={<div style={{ height: `700px` }} />}
+                            containerElement={<div style={{ height: `800px` }} />}
                             mapElement={<div style={{ height: `100%` }} />}
                         />
                     </div>
