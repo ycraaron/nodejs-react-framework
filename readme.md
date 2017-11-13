@@ -19,6 +19,7 @@ The whole web application follows the standard MVC pattern and have RESTful API.
  * [models](./models)
    * [Movie.js](./models/Model.js)
  * [controllers](./controllers)
+   * [MovieController.js](./models/MovieController.js)
  * [views](./views)
    * [index.hjs](./views/index.hjs)
  * [src](./src)
