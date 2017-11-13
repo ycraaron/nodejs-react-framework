@@ -10,7 +10,7 @@ The data is available on DataSF: Film Locations.
 
 # Introduction
 As is specified in code chanllenge, the website implement the basic functionality requirements.
-Thanks for taking time going through this document. This is my first React + Node.js web application I have ever built. Your advice would be precious to me to make improvements.
+Thanks for taking time going through this document. Since I didn't have any experience related to React and Node.js programming, this is my first Full-stack React + Node.js web application I have ever built. Your advice would be precious to me to make improvements.
 
 ## Design
 The whole web application follows the standard MVC pattern and have RESTful API.
@@ -44,6 +44,7 @@ The whole web application follows the standard MVC pattern and have RESTful API.
 ## Built With
 
 * [React](https://reactjs.org/) - The front end I used
+* [Node.js](https://nodejs.org/) - Backend
 * [npm](https://www.npmjs.com/) - Packagement Management
 * [Express](https://expressjs.com/) - Web framework for Node.js
 * [Material UI](http://www.material-ui.com/) - UI library
