@@ -16,6 +16,7 @@ router.get('/', function(req, res, next){
 router.get('/:resource', function(req, res, next){
     let resource = req.params.resource
     if (resource == 'save-movie-to-mongo'){
+        // tmp disabled this fucntion
         // let rawData = fs.readFileSync('./src/data/movie-part1.json')
         // let movies = JSON.parse(rawData)
         // for(let i = 0; i < movies.length; i=i+1){
@@ -40,21 +41,21 @@ router.get('/:resource', function(req, res, next){
             results: 'api call disabled'
         })
     }
-    else if(resource == 'load-all-markers'){
+    else if (resource == 'load-all-markers'){
         console.log('start loading markers')
         MovieController.findAll(req.params,function(err, results){
             if(!err){
                 console.log('markers loaded')
                 res.json({
-                    confimation: 'success',
+                    confirmation: 'success',
                     results:results
                 })
                 return
             }
             else
                 res.json({
-                    confimation: 'fail',
-                    results:'fail'
+                    confirmation: 'fail',
+                    results:'fail loading markers'
                 })
         })
     }

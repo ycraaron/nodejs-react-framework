@@ -1,8 +1,6 @@
-// import {Zone} from '../models/Zone'
-// controller are meant to execute specific to the resources
+// controller are meant to execute specific process to the resources
 
 let Movie = require('../models/Movie')
-
 
 // AIzaSyDKHXaaZZmXiTBx_jIXupCXZavq06jT614
 const googleMapsClient = require('@google/maps').createClient({
@@ -11,9 +9,6 @@ const googleMapsClient = require('@google/maps').createClient({
 
 
 module.exports = {
-    
-    // name find not working
-    // conflict to system reserved keyword?
     findByName : function(name, callback){
         console.log('calling aarontest')
         Movie.find({title:name}, function(err, movies){
@@ -153,8 +148,4 @@ module.exports = {
     //     })
     // }
 
-}
-
-function newFunction() {
-    return { type: String, default: '' };
 }

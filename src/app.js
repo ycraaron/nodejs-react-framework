@@ -8,15 +8,6 @@ import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import Home from './components/Home'
 import Banner from './components/Banner'
-// class App extends Component {
-//     render(){
-//         return (
-//             <div> 
-//                 <ZoneContainer />
-//             </div>
-//         )
-//     }
-// }
 
 class App extends Component {
     render(){

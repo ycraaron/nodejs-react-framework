@@ -7,6 +7,8 @@ import AutoComplete from 'material-ui/AutoComplete';
 import darkBaseTheme from 'material-ui/styles/baseThemes/darkBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import RaisedButton from 'material-ui/FlatButton';
+import APImanager from '../utils/APImanager'
+import { callback } from '@google/maps/lib/internal/cli';
 
 class Home extends Component {
 
@@ -39,19 +41,38 @@ class Home extends Component {
         }
     }
 
-    componentDidMount(){
-        console.log('component did mount in Home')
+    loadMovieNames(callback){
+        //load movie names        
+        APImanager.get('/api/load-movie-names', null, (err, response) =>{
+            if (err) {
+                callback(err, null)
+                return
+            }
+            console.log('here using api manager in loadMovieNames')
+            let results = response.results
+            // console.log(results)
+            let i = 1
+            let newTitles = []
+            let movieNames = []
+            results.forEach(function(title){
+                let dic_title = {id:i, label:title}
+                newTitles.push(dic_title)
+                movieNames.push(title)
+                i += 1
+            },this)
+            callback(null, {newTitles:newTitles, movieNames:movieNames})
+        })
+    }
 
-        // load markers
-        superagent
-        .get('/api/load-all-markers')
-        .query(null)
-        .set('Accept', 'application/json')
-        .end((err, response) =>{
-            if(err)
-                alert('error loading markers')
-            let results = JSON.parse(response.text).results
+    loadMarkers(callback){
+        APImanager.get('/api/load-all-markers', null, (err, response) =>{
+            if (err) {
+                callback(err, null)
+                return
+            }
+            console.log('here using api manager in loadMarkers') 
             let markers = []
+            let results = response.results
             results.forEach(function(movie) {
                 let title = movie.title
                 let lat = movie.locations[0].coord.lat
@@ -59,39 +80,30 @@ class Home extends Component {
                 let dic_location = {location:{lat:lat, lng:lng}, title:title, active:1, red:'0'}
                 markers.push(dic_location)
             }, this);
-            console.log('before')
-            console.log(markers)
+            callback(null, {markers: markers})
+        })
+    }
+    componentDidMount(){
+        console.log('component did mount in Home')        
+        this.loadMovieNames((err, results) => {
+            if (err){
+                alert('ERROR' + err)
+                return
+            }
             this.setState({
-                markers: markers
+                titles: results.newTitles,
+                movies: results.movieNames
             })
         })
-
-        //load movie names
-        let newState = this.state
-        let newTitles = []
-        let movieNames = []
-        superagent
-        .get('/api/load-movie-names')
-        .query(null)
-        .set('Accept', 'application/json')
-        .end((err,response) => {
-            if(err)
-                alert('error loading movie names')
-            let results = JSON.parse(response.text).results
-            console.log(results)
-            let i = 1
-            results.forEach(function(title){
-                let dic_title = {id:i, label:title}
-                newTitles.push(dic_title)
-                movieNames.push(title)
-                i += 1
-            },this)
+        this.loadMarkers((err,results) => {
+            if (err){
+                alert('ERROR' + err)
+                return
+            }
+            this.setState({
+                markers:results.markers
+            })
         })
-        this.setState({
-            titles: newTitles,
-            movies: movieNames
-        })
-
     }
 
     searchFilm(title){
