@@ -13,8 +13,22 @@ As is specified in code chanllenge, the website implement the basic functionalit
 Thanks for taking time going through this document. This is my first React + Node.js web application I have ever built. Your advice would be precious to me to make improvements.
 
 ## Design
-The design of the whole web application follows the standard MVC pattern and provides RESTful API.
+The whole web application follows the standard MVC pattern and have RESTful API.
+### Project structure(exclude dependencies)
+.
+ * [models](./bin)
+   * [Movie.js](./dir2/file21.ext)
+ * [src](./src)
+   * [components](./src/components)
+     * [Banner.js](./src/components/Banner.js)
+     * [Gmap.js](./src/components/Gmap.js)
+     * [Home.js](./src/components/Home.js)
+     * [styles.js](./src/components/styles.js)
+ * [file_in_root.ext](./file_in_root.ext)
+ * [README.md](./README.md)
+ * [dir3](./dir3)
 
+## Functionality
 ### Frontend (React)
      1. Display the map where movies have been filmed in San Francisco.
      2. Provide an autocompletion search bar for user to filter the moives.
