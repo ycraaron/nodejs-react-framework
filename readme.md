@@ -29,9 +29,9 @@ The whole web application follows the standard MVC pattern and have RESTful API.
      * [Home.js](./src/components/Home.js)
      * [styles.js](./src/components/styles.js)
    * [app.js](./src/app.js) 
- * [file_in_root.ext](./file_in_root.ext)
- * [README.md](./README.md)
- * [dir3](./dir3)
+ * [routes](./routes)
+   * [api.js](./routes/api.js)
+ * [app.js](./app.js)
 
 ## Functionality
 ### Frontend (React)
