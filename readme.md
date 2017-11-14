@@ -50,6 +50,8 @@ The project is built with express, which is a widely used web framework for Node
  * [app.js](./app.js)                                  // Entry point for whole App
  
 
+## To be edited
+
 ## Built With
 * [React](https://reactjs.org/) - The front end I used
 * [Node.js](https://nodejs.org/) - Backend
