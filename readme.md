@@ -13,9 +13,18 @@ The data is available on DataSF: Film Locations.
 
 - Since I didn't have any experience related to React and Node.js programming before, this is the first Full-stack React + Node.js web application I have ever built. Your advice would be precious to me to make improvements. Thanks for taking time going through this document. 
 
+## Functionality
+### Frontend (React)
+     1. Display the map where movies have been filmed in San Francisco.
+     2. Provide an autocompletion search bar for user to filter the moives.
+### Backend (Node.js)
+     1. Collect {lat, lng} data with their addresses using Geocode.
+     2. Prepare and process data to be displayed in frontend.
+
 ## Design
 The whole web application follows the standard MVC pattern and have RESTful API.
-### Project structure(exclude dependencies)
+
+## Project structure(exclude dependencies)
 .
  * [models](./models)
    * [Movie.js](./models/Model.js)
@@ -29,21 +38,15 @@ The whole web application follows the standard MVC pattern and have RESTful API.
      * [Gmap.js](./src/components/Gmap.js)
      * [Home.js](./src/components/Home.js)
      * [styles.js](./src/components/styles.js)
+   * [utils](./src/utils)
+     * [APImanager.js](./src/utils/APImanager.js)
    * [app.js](./src/app.js) 
  * [routes](./routes)
    * [api.js](./routes/api.js)
  * [app.js](./app.js)
 
-## Functionality
-### Frontend (React)
-     1. Display the map where movies have been filmed in San Francisco.
-     2. Provide an autocompletion search bar for user to filter the moives.
-### Backend (Node.js)
-     1. Collect {lat, lng} data with their addresses using Geocode.
-     2. Prepare and process data to be displayed in frontend.
 
-## Built With
-
+# Built With
 * [React](https://reactjs.org/) - The front end I used
 * [Node.js](https://nodejs.org/) - Backend
 * [npm](https://www.npmjs.com/) - Packagement Management
@@ -52,4 +55,4 @@ The whole web application follows the standard MVC pattern and have RESTful API.
 * [Google MAP API](https://developers.google.com/maps/) - Google Map API
 
 # TO DO LIST:
-Add label to each marker.
+Add infowindow to each marker.
