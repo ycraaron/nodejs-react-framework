@@ -1,17 +1,20 @@
 
-# Code challenge
+## Code challenge
 Create a service that shows on a map where movies have been filmed in San Francisco. The user should be able to filter the view using autocompletion search.
 The data is available on DataSF: Film Locations.
 
-# Links
+## Links
 
 - Website: [Website](http://13.59.162.183:3000)
 - Linkedin Profile: [https://www.linkedin.com/in/craaronyang/]
 
-# Introduction
+## Introduction
+
+- Tech stack
+     - React+Node.js+MongoDB
 - As is specified in code chanllenge, the website is developed according to the basic functionality requirements.
 
-- Since I didn't have any experience related to React and Node.js programming before, this is the first Full-stack React + Node.js web application I have ever built. Your advice would be precious to me to make improvements. Thanks for taking time going through this document. 
+- Since I didn't have any experience related to React or Node.js programming before, this is the first Full-stack React + Node.js web application I have ever built. Your advice would be precious to me to make improvements. Thanks for taking time going through this document. 
 
 ## Functionality
 ### Frontend (React)
@@ -25,6 +28,7 @@ The data is available on DataSF: Film Locations.
 The whole web application follows the standard MVC pattern and have RESTful API.
 
 ## Project structure(exclude dependencies)
+The project is built with express, which is a widely used web framework for Node.js
 .
  * [models](./models)
    * [Movie.js](./models/Model.js)
@@ -45,6 +49,13 @@ The whole web application follows the standard MVC pattern and have RESTful API.
    * [api.js](./routes/api.js)
  * [app.js](./app.js)
 
+### Model
+     
+### Controller
+
+### View
+
+### routes
 
 # Built With
 * [React](https://reactjs.org/) - The front end I used
