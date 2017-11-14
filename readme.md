@@ -30,7 +30,7 @@ The whole web application follows the standard MVC pattern and have RESTful API.
 ## Project structure(exclude dependencies)
 The project is built with express, which is a widely used web framework for Node.js
 .
- * [models](./models)                                  // Directory for the model files related to collections in MongoDB.
+ * [models](./models)                                  // Directory for the model files for collections in MongoDB.
    * [Movie.js](./models/Model.js)                     // Model for MovieSchema
  * [controllers](./controllers)                        // Directory for controller files
    * [MovieController.js](./models/MovieController.js) // Controller for MovieSchema
