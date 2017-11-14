@@ -30,34 +30,27 @@ The whole web application follows the standard MVC pattern and have RESTful API.
 ## Project structure(exclude dependencies)
 The project is built with express, which is a widely used web framework for Node.js
 .
- * [models](./models)
-   * [Movie.js](./models/Model.js)
- * [controllers](./controllers)
-   * [MovieController.js](./models/MovieController.js)
- * [views](./views)
-   * [index.hjs](./views/index.hjs)
- * [src](./src)
-   * [components](./src/components)
-     * [Banner.js](./src/components/Banner.js)
-     * [Gmap.js](./src/components/Gmap.js)
-     * [Home.js](./src/components/Home.js)
-     * [styles.js](./src/components/styles.js)
-   * [utils](./src/utils)
-     * [APImanager.js](./src/utils/APImanager.js)
-   * [app.js](./src/app.js) 
- * [routes](./routes)
-   * [api.js](./routes/api.js)
- * [app.js](./app.js)
+ * [models](./models)                                  // Directory for the model files related to collections in MongoDB.
+   * [Movie.js](./models/Model.js)                     // Model for MovieSchema
+ * [controllers](./controllers)                        // Directory for controller files
+   * [MovieController.js](./models/MovieController.js) // Controller for MovieSchema
+ * [views](./views)                                    // Directory for HTML templates
+   * [index.hjs](./views/index.hjs)                    // Template for main page
+ * [src](./src)                                        // Directory for JS source code
+   * [components](./src/components)                    // Directory for components
+     * [Banner.js](./src/components/Banner.js)         // Bottom bar component
+     * [Gmap.js](./src/components/Gmap.js)             // Google Map component
+     * [Home.js](./src/components/Home.js)             // Home page component
+     * [styles.js](./src/components/styles.js)         // File which exports styles needed in other JS file
+   * [utils](./src/utils)                              // Directory for saving those wrapper/helper classes
+     * [APImanager.js](./src/utils/APImanager.js)      // Wrapper class for sending requests
+   * [app.js](./src/app.js)                            // Entry point for my page             
+ * [routes](./routes)                                  // Directory for routers
+   * [api.js](./routes/api.js)                         // Router for API call to MovieController
+ * [app.js](./app.js)                                  // Entry point for whole App
+ 
 
-### Model
-     
-### Controller
-
-### View
-
-### routes
-
-# Built With
+## Built With
 * [React](https://reactjs.org/) - The front end I used
 * [Node.js](https://nodejs.org/) - Backend
 * [npm](https://www.npmjs.com/) - Packagement Management
@@ -65,5 +58,5 @@ The project is built with express, which is a widely used web framework for Node
 * [Material UI](http://www.material-ui.com/) - UI library
 * [Google MAP API](https://developers.google.com/maps/) - Google Map API
 
-# TO DO LIST:
+## TO DO LIST:
 Add infowindow to each marker.
